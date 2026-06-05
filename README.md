@@ -1,69 +1,80 @@
 # ternary-walk
 
-**Random walks on the ternary domain {-1, 0, +1}. Where does chance take you?**
+**Ternary random walks: simple, biased, correlated, and Lévy flights on Z₃ state space**
 
-A random walk is the simplest stochastic process: start somewhere, take a random step, repeat. In ternary, each step adds -1, 0, or +1 to your current position (clamped to {-1, 0, +1}). The walk is confined to three states — it can't escape. This confinement makes ternary walks fundamentally different from unbounded walks: they're *ergodic* (every state is reachable from every other state) and *recurrent* (every state is visited infinitely often).
+[![ternary](https://img.shields.io/badge/ecosystem-ternary-blue)](https://github.com/orgs/SuperInstance/repositories?q=ternary)
+[![tests](https://img.shields.io/badge/tests-8-green)]()
 
-This crate implements multiple walk types: simple, biased, correlated, absorbing, reflecting, and spatial. Each captures a different aspect of randomness in ternary space.
+## Overview
 
-## What's Inside
+Ternary random walks: simple, biased, correlated, and Lévy flights on Z₃ state space.
 
-- **`SimpleTernaryWalk`** — uniform random steps in {-1, 0, +1}, clamped
-- **`BiasedWalk`** — weighted probabilities for each direction
-- **`CorrelatedWalk`** — momentum: each step depends on the previous direction
-- **`AbsorbingWalk`** — stops when hitting a specific value
-- **`ReflectingWalk`** — boundaries bounce the walker back
-- **`SpatialTernaryWalk`** — walk on a 2D ternary grid, reading values at each step
-- **`WalkStatistics`** — position history, min, max, mean, variance, zero crossings, time in each state
-- **`FirstPassageTime`** — steps to first reach each value
-- **`OccupationMeasure`** — fraction of time spent in each state
-- **`ReturnTimeDistribution`** — steps between returns to each state
+## Architecture
 
-## Quick Example
+- **`TernaryWalk`** — core data structure
+- **`WalkEnsemble`** — core data structure
 
-```rust
-use ternary_walk::*;
+### Key Functions
 
-let mut walk = BiasedWalk::new([1, 2, 3]); // weights: [-1, 0, +1]
-// +1 is 3x more likely than -1
+- `new()`
+- `step_simple()`
+- `step_biased()`
+- `step_correlated()`
+- `step_levy()`
+- `step_count()`
+- `occupation()`
+- `return_time()`
+- `new()`
+- `mean_occupation()`
+- ... and 1 more
 
-let mut stats = WalkStatistics::new();
-for _ in 0..1000 {
-    let step = walk.step();
-    stats.record(step);
-}
+## Why Ternary?
 
-println!("Mean: {:.2}", stats.mean());
-println!("Occupation: -1={:.1}%, 0={:.1}%, +1={:.1}%",
-    stats.fraction_at(-1) * 100.0,
-    stats.fraction_at(0) * 100.0,
-    stats.fraction_at(1) * 100.0);
+The balanced ternary system {-1, 0, +1} (also known as Z₃) is the mathematically optimal discrete encoding:
+- **More expressive than binary**: three states capture positive, neutral, and negative
+- **Natural for decisions**: accept/reject/abstain, buy/hold/sell, agree/disagree/neutral
+- **Self-balancing**: the 0 state acts as a universal screen, preventing pathological lock-in
+- **Z₃ cyclic dynamics**: rock-paper-scissors is the only natural coordination mechanism
+
+## Stats
+
+| Metric | Value |
+|--------|-------|
+| Lines of Rust | 228 |
+| Test count | 8 |
+| Public types | 2 |
+| Public functions | 11 |
+
+## Ecosystem
+
+This crate is part of the **[SuperInstance Ternary Fleet](https://github.com/orgs/SuperInstance/repositories?q=ternary)**:
+
+- **[ternary-core](https://github.com/SuperInstance/ternary-core)** — shared traits and Z₃ arithmetic
+- **[ternary-grid](https://github.com/SuperInstance/ternary-grid)** — spatial grid with {-1, 0, +1} cells
+- **[ternary-graph](https://github.com/SuperInstance/ternary-graph)** — ternary-weighted graph algorithms
+- **[ternary-automata](https://github.com/SuperInstance/ternary-automata)** — three-state cellular automata
+- **[ternary-compiler](https://github.com/SuperInstance/ternary-compiler)** — expression compiler and optimizer
+
+200+ crates. 4,300+ tests. One pattern.
+
+## Research Context
+
+The ternary approach connects to several active research areas:
+- **Ternary Neural Networks** (TNNs): weights constrained to {-1, 0, +1} for efficient inference
+- **Huawei's ternary chip**: 7nm ternary silicon with 60% less power consumption
+- **Active inference**: free energy minimization naturally maps to ternary action selection
+- **Cyclic dominance**: RPS dynamics maintain biodiversity in spatial ecology
+- **Z₃ group theory**: the only algebraic group on three elements is cyclic addition mod 3
+
+## Usage
+
+```toml
+[dependencies]
+ternary-walk = "0.1.0"
 ```
 
-## The Deeper Truth
-
-**Ternary walks are always recurrent.** In an unbounded random walk (on the integers), the walk can drift to infinity and never return. On ternary {-1, 0, +1}, it can't — there are only three states, and the walk visits all of them infinitely often. This means every ternary walk has a stationary distribution, and the occupation measure converges to it regardless of the starting state.
-
-The `no_std` implementation means this runs on bare metal — microcontrollers, embedded systems, anywhere you need random ternary dynamics without an operating system.
-
-**Use cases:**
-- **Stochastic modeling** — random exploration of ternary state spaces
-- **Monte Carlo simulation** — ternary walks as random number generators
-- **Noise generation** — random ternary sequences for dithering or testing
-- **Agent behavior** — random exploration strategies
-- **Markov chain analysis** — ternary walks are Markov chains with 3 states
-
-## See Also
-
-- **ternary-drift** — population-level random walks (Wright-Fisher)
-- **ternary-markov** — Markov chain prediction (walks with memory)
-- **ternary-life** — deterministic walks on grids (Game of Life)
-- **ternary-fib** — deterministic cyclic walks (period 8)
-
-## Install
-
-```bash
-cargo add ternary-walk
+```rust
+use ternary_walk;
 ```
 
 ## License
