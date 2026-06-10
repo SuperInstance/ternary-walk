@@ -1,4 +1,6 @@
 [package]
+description = "ternary-walk - SuperInstance ecosystem crate"
+repository = "https://github.com/SuperInstance/ternary-walk"
 name = "ternary-walk"
 version = "0.1.0"
 edition = "2021"
